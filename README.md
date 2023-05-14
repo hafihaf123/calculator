@@ -1,1 +1,3 @@
 # calculator
+
+This is a Java program that can perform simple arithmetic calculations as well as advanced mathematical calculations, such as finding the volume and surface area of a prism or solving quadratic equations. The program prompts the user to enter an expression, which can be a mathematical equation or a command that leads to an advanced calculation. If the user enters a mathematical expression, the program evaluates it using the standard order of operations. If the user enters a command starting with "/", the program offers three options: finding the volume and surface area of a prism, solving a quadratic equation, or applying the rule of three. Depending on the user's choice, the program prompts the user to enter the required parameters and returns the result.
