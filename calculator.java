@@ -41,11 +41,6 @@ class calc {
 }
 
 class Expression {
-    public String calc(String ex) {
-        double result = eval(ex);
-        return ex + " = " + result;
-    }
-
     private static double eval(String str) {
         return new Object() {
             int pos = -1, ch;
@@ -66,14 +61,14 @@ class Expression {
             double parse() {
                 nextChar();
                 double x = parseExpression();
-                if (pos < str.length()) throw new RuntimeException("Unexpected: " + (char)ch);
+                if (pos < str.length()) throw new RuntimeException("Unexpected: " + (char) ch);
                 return x;
             }
 
             double parseExpression() {
                 double x = parseTerm();
-                for (;;) {
-                    if      (skip('+')) x += parseTerm(); // addition
+                for (; ; ) {
+                    if (skip('+')) x += parseTerm(); // addition
                     else if (skip('-')) x -= parseTerm(); // subtraction
                     else return x;
                 }
@@ -81,8 +76,8 @@ class Expression {
 
             double parseTerm() {
                 double x = parseFactor();
-                for (;;) {
-                    if      (skip('*')) x *= parseFactor(); // multiplication
+                for (; ; ) {
+                    if (skip('*')) x *= parseFactor(); // multiplication
                     else if (skip('/')) x /= parseFactor(); // division
                     else return x;
                 }
@@ -115,7 +110,7 @@ class Expression {
                         default -> throw new RuntimeException("Unknown function: " + func);
                     };
                 } else {
-                    throw new RuntimeException("Unexpected: " + (char)ch);
+                    throw new RuntimeException("Unexpected: " + (char) ch);
                 }
 
                 if (skip('^')) x = Math.pow(x, parseFactor()); // exponentiation
@@ -131,8 +126,12 @@ class Expression {
             int factorial = 1;
             for (int i = 1; i <= x; i++) factorial *= i;
             return factorial;
-        }
-        else throw new RuntimeException("factorial: invalid number: " + x);
+        } else throw new RuntimeException("factorial: invalid number: " + x);
+    }
+
+    public String calc(String ex) {
+        double result = eval(ex);
+        return ex + " = " + result;
     }
 }
 
