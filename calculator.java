@@ -19,20 +19,20 @@ import java.util.Scanner;
                    System.out.println("options:");
                    System.out.println("1. prism (p)");
                    System.out.println("2. quadratic function (q)");
-                   System.out.println("3. trojclenka - rule of three (3)");
+                   System.out.println("3. rule of three (Ro3)");
                    System.out.println("4. convert (c)");
                    String option = sc.nextLine();
                    res = switch (option) {
                        case "1", "p", "prism" -> adv.prism();
                        case "2", "q", "quadratic" -> adv.quadratic();
-                       case "3", "trojclenka", "Ro3" -> adv.trojclenka();
+                       case "3", "rule of three", "Ro3" -> adv.Ro3();
                        case "4", "convert", "c" -> adv.convert();
                        default -> "Error_incorrect_input";
                    };
                }
                case "/prism" -> res = adv.prism();
                case "/quadratic", "/quadr" -> res = adv.quadratic();
-               case "/trojclenka", "/Ro3" -> res = adv.trojclenka();
+               case "/Ro3" -> res = adv.Ro3();
                case "/convert", "/unit" -> res = adv.convert();
                default -> res = "Error";
            }
@@ -150,7 +150,7 @@ import java.util.Scanner;
          return ("two real solutions: x1 = " + x1 + " ; x2 = " + x2);
        }
      }
-   public String trojclenka()
+   public String Ro3()
      {
        Scanner sc = new Scanner(System.in);
        System.out.print("a ... b\nc ... x\na:");
@@ -159,26 +159,26 @@ import java.util.Scanner;
        double b = sc.nextDouble();
        System.out.print("c: ");
        double c = sc.nextDouble();
-       System.out.println("priama alebo nepriama umernost? (p/n)");
+       System.out.println("normal or inverse proportionality? (n/i)");
        char umernost = sc.next().charAt(0);
        sc.close();
-       if (umernost == 'p') {
+       if (umernost == 'n') {
          double x = (b*c)/a;
-         return ("x = " + x + " (priama umernost)");
+         return ("x = " + x + " (normal proportionality)");
        }
-       else if (umernost == 'n') {
+       else if (umernost == 'i') {
          double x = (a*b)/c;
-         return ("x = " + x + " (nepriama umernost)");
+         return ("x = " + x + " (inverse proportionality)");
        }
        else return "Err_incorrect_input";
      }
    public String convert()
      {
        Scanner sc = new Scanner(System.in);
-       System.out.print("number: ");
-       double a = sc.nextDouble();
-       System.out.println("Unit type: (acc angle)");
+       System.out.println("Unit type: (acc angle area data length speed time)");
        String type = sc.next();
+       System.out.print("number: ");
+         double a = sc.nextDouble();
        double x; String unit; String to;
          switch (type) {
              case "acc" -> {
@@ -295,7 +295,331 @@ import java.util.Scanner;
                          return "Err_incorrect_input";
                      }
                  }
-                 return "%f %s = %.4f %s".formatted(a, unit, x, to);
+                 return "%s %s = %.2f %s".formatted(a, unit, x, to);
+             }
+             case "area" -> {
+                 System.out.println("unit: (m^2 km^2 ft^2 yd^2 mi^2)");
+                 unit = sc.next();
+                 switch (unit) {
+                     case "m^2" -> {
+                         System.out.println("convert to: (km^2 ft^2 yd^2 mi^2)");
+                         to = sc.next();
+                         switch (to) {
+                             case "km^2" -> x = a / 1000000;
+                             case "ft^2" -> x = a / 0.0929;
+                             case "yd^2" -> x = a / 0.8361;
+                             case "mi^2" -> x = a / 2589988.1103;
+                             default -> {
+                                 return "Err_incorrect_input";
+                             }
+                         }
+                     }
+                     case "km^2" -> {
+                         System.out.println("convert to: (m^2 ft^2 yd^2 mi^2)");
+                         to = sc.next();
+                         switch (to) {
+                             case "m^2" -> x = a * 1000000;
+                             case "ft^2" -> x = a * 10763910.4167;
+                             case "yd^2" -> x = a * 1195990.0463;
+                             case "mi^2" -> x = a / 2.59;
+                             default -> {
+                                 return "Err_incorrect_input";
+                             }
+                         }
+                     }
+                     case "ft^2" -> {
+                         System.out.println("convert to: (m^2 km^2 yd^2 mi^2)");
+                         to = sc.next();
+                         switch (to) {
+                             case "m^2" -> x = a / 10.7639;
+                             case "km^2" -> x = a / 10763910.4167;
+                             case "yd^2" -> x = a / 9;
+                             case "mi^2" -> x = a / 27878400;
+                             default -> {
+                                 return "Err_incorrect_input";
+                             }
+                         }
+                     }
+                     case "yd^2" -> {
+                         System.out.println("convert to: (m^2 km^2 ft^2 mi^2)");
+                         to = sc.next();
+                         switch (to) {
+                             case "m^2" -> x = a / 1.196;
+                             case "km^2" -> x = a / 1195990.0463;
+                             case "ft^2" -> x = a * 9;
+                             case "mi^2" -> x = a / 3097600;
+                             default -> {
+                                 return "Err_incorrect_input";
+                             }
+                         }
+                     }
+                     case "mi^2" -> {
+                         System.out.println("convert to: (m^2 km^2 ft^2 yd^2)");
+                         to = sc.next();
+                         switch (to) {
+                             case "m^2" -> x = a * 2589988.1103;
+                             case "km^2" -> x = a / 0.3861;
+                             case "ft^2" -> x = a * 27878400;
+                             case "yd^2" -> x = a * 3097600;
+                             default -> {
+                                 return "Err_incorrect_input";
+                             }
+                         }
+                     }
+                     default -> {
+                         return "Err_incorrect_input";
+                     }
+                 }
+                 return "%s %s = %.2f %s".formatted(a, unit, x, to);
+             }
+             case "data" -> {
+                 System.out.println("unit: (Mb Gb MB GB)");
+                 unit = sc.next();
+                 switch (unit) {
+                     case "Mb" -> {
+                         System.out.println("convert to: (Gb MB GB)");
+                         to = sc.next();
+                         switch (to) {
+                             case "Gb" -> x = a / 1000;
+                             case "MB" -> x = a / 8;
+                             case "GB" -> x = a / 8000;
+                             default -> {
+                                 return "Err_incorrect_input";
+                             }
+                         }
+                     }
+                     case "Gb" -> {
+                         System.out.println("convert to: (Mb MB GB)");
+                         to = sc.next();
+                         switch (to) {
+                             case "Mb" -> x = a * 1000;
+                             case "MB" -> x = a * 125;
+                             case "GB" -> x = a / 8;
+                             default -> {
+                                 return "Err_incorrect_input";
+                             }
+                         }
+                     }
+                     case "MB" -> {
+                         System.out.println("convert to: (Mb Gb GB)");
+                         to = sc.next();
+                         switch (to) {
+                             case "Mb" -> x = a * 8;
+                             case "Gb" -> x = a / 125;
+                             case "GB" -> x = a / 1000;
+                             default -> {
+                                 return "Err_incorrect_input";
+                             }
+                         }
+                     }
+                     case "GB" -> {
+                         System.out.println("convert to: (Mb Gb MB)");
+                         to = sc.next();
+                         switch (to) {
+                             case "Mb" -> x = a * 8000;
+                             case "Gb" -> x = a * 8;
+                             case "MB" -> x = a * 1000;
+                             default -> {
+                                 return "Err_incorrect_input";
+                             }
+                         }
+                     }
+                     default -> {
+                         return "Err_incorrect_input";
+                     }
+                 }
+                 return "%s %s = %.2f %s".formatted(a, unit, x, to);
+             }
+             case "length" -> {
+                 System.out.println("unit: (m km in ft mi)");
+                 unit = sc.next();
+                 switch (unit) {
+                     case "m" -> {
+                         System.out.println("convert to: (km in ft mi)");
+                         to = sc.next();
+                         switch (to) {
+                             case "km" -> x = a / 1000;
+                             case "in" -> x = a * 39.3701;
+                             case "ft" -> x = a * 3.2808;
+                             case "mi" -> x = a / 1609.344;
+                             default -> {
+                                 return "Err_incorrect_input";
+                             }
+                         }
+                     }
+                     case "km" -> {
+                         System.out.println("convert to: (m in ft mi)");
+                         to = sc.next();
+                         switch (to) {
+                             case "m" -> x = a * 1000;
+                             case "in" -> x = a * 39370.0787;
+                             case "ft" -> x = a * 3280.8399;
+                             case "mi" -> x = a / 1.6093;
+                             default -> {
+                                 return "Err_incorrect_input";
+                             }
+                         }
+                     }
+                     case "in" -> {
+                         System.out.println("convert to: (m km ft mi)");
+                         to = sc.next();
+                         switch (to) {
+                             case "m" -> x = a / 39.3701;
+                             case "km" -> x = a / 39370.0787;
+                             case "ft" -> x = a / 12;
+                             case "mi" -> x = a / 63360;
+                             default -> {
+                                 return "Err_incorrect_input";
+                             }
+                         }
+                     }
+                     case "ft" -> {
+                         System.out.println("convert to: (m km in mi)");
+                         to = sc.next();
+                         switch (to) {
+                             case "m" -> x = a / 3.2808;
+                             case "km" -> x = a / 3280.8399;
+                             case "in" -> x = a * 12;
+                             case "mi" -> x = a / 5280;
+                             default -> {
+                                 return "Err_incorrect_input";
+                             }
+                         }
+                     }
+                     case "mi" -> {
+                         System.out.println("convert to: (m km in ft)");
+                         to = sc.next();
+                         switch (to) {
+                             case "m" -> x = a * 1609.344;
+                             case "km" -> x = a * 1.6093;
+                             case "in" -> x = a * 63360;
+                             case "ft" -> x = a * 5280;
+                             default -> {
+                                 return "Err_incorrect_input";
+                             }
+                         }
+                     }
+                     default -> {
+                         return "Err_incorrect_input";
+                     }
+                 }
+                 return "%s %s = %.2f %s".formatted(a, unit, x, to);
+             }
+             case "speed" -> {
+                 System.out.println("unit: (m/s km/h ft/s mi/h)");
+                 unit = sc.next();
+                 switch (unit) {
+                     case "m/s" -> {
+                         System.out.println("convert to: (km/h ft/s mi/h)");
+                         to = sc.next();
+                         switch (to) {
+                             case "km/h" -> x = a * 3.6;
+                             case "ft/s" -> x = a * 3.2808;
+                             case "mi/h" -> x = a * 2.2369;
+                             default -> {
+                                 return "Err_incorrect_input";
+                             }
+                         }
+                     }
+                     case "km/h" -> {
+                         System.out.println("convert to: (m/s ft/s mi/h)");
+                         to = sc.next();
+                         switch (to) {
+                             case "m/s" -> x = a / 3.6;
+                             case "ft/s" -> x = a / 1.0973;
+                             case "mi/h" -> x = a / 1.6093;
+                             default -> {
+                                 return "Err_incorrect_input";
+                             }
+                         }
+                     }
+                     case "ft/s" -> {
+                         System.out.println("convert to: (m/s km/h mi/h)");
+                         to = sc.next();
+                         switch (to) {
+                             case "m/s" -> x = a / 3.2808;
+                             case "km/h" -> x = a * 1.0973;
+                             case "mi/h" -> x = a / 1.4667;
+                             default -> {
+                                 return "Err_incorrect_input";
+                             }
+                         }
+                     }
+                     case "mi/h" -> {
+                         System.out.println("convert to: (m/s km/h ft/s)");
+                         to = sc.next();
+                         switch (to) {
+                             case "m/s" -> x = a / 2.2369;
+                             case "km/h" -> x = a * 1.6093;
+                             case "ft/s" -> x = a * 1.4667;
+                             default -> {
+                                 return "Err_incorrect_input";
+                             }
+                         }
+                     }
+                     default -> {
+                         return "Err_incorrect_input";
+                     }
+                 }
+                 return "%s %s = %.2f %s".formatted(a, unit, x, to);
+             }
+             case "time" -> {
+                 System.out.println("unit: (ms sec min hr)");
+                 unit = sc.next();
+                 switch (unit) {
+                     case "ms" -> {
+                         System.out.println("convert to: (sec min hr)");
+                         to = sc.next();
+                         switch (to) {
+                             case "sec" -> x = a / 1000;
+                             case "min" -> x = a / 60000;
+                             case "hr" -> x = a / 3600000;
+                             default -> {
+                                 return "Err_incorrect_input";
+                             }
+                         }
+                     }
+                     case "sec" -> {
+                         System.out.println("convert to: (ms min hr)");
+                         to = sc.next();
+                         switch (to) {
+                             case "ms" -> x = a * 1000;
+                             case "min" -> x = a / 60;
+                             case "hr" -> x = a / 3600;
+                             default -> {
+                                 return "Err_incorrect_input";
+                             }
+                         }
+                     }
+                     case "min" -> {
+                         System.out.println("convert to: (ms sec hr)");
+                         to = sc.next();
+                         switch (to) {
+                             case "ms" -> x = a * 60000;
+                             case "sec" -> x = a * 60;
+                             case "hr" -> x = a / 60;
+                             default -> {
+                                 return "Err_incorrect_input";
+                             }
+                         }
+                     }
+                     case "hr" -> {
+                         System.out.println("convert to: (ms sec min)");
+                         to = sc.next();
+                         switch (to) {
+                             case "ms" -> x = a * 3600000;
+                             case "sec" -> x = a * 3600;
+                             case "min" -> x = a * 60;
+                             default -> {
+                                 return "Err_incorrect_input";
+                             }
+                         }
+                     }
+                     default -> {
+                         return "Err_incorrect_input";
+                     }
+                 }
+                 return "%s %s = %.2f %s".formatted(a, unit, x, to);
              }
              default -> {
                  return "Err_incorrect_input";
