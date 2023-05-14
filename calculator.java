@@ -1,3 +1,4 @@
+import java.lang.reflect.Method;
 import java.util.Scanner;
 
 class calc {
@@ -7,45 +8,44 @@ class calc {
         String ex = sc.nextLine();
         String res;
         if (ex.toCharArray()[0] == '/') {
-            //System.out.println("work in progress");
             Adv adv = new Adv();
             switch (ex) {
                 case "/" -> {
                     System.out.println("options:");
-                    System.out.println("1. prism (p)");
-                    System.out.println("2. quadratic function (q)");
+                    System.out.println("1. convert (c)");
+                    System.out.println("2. bodies (b)");
                     System.out.println("3. rule of three (Ro3)");
-                    System.out.println("4. convert (c)");
+                    System.out.println("4. quadratic function (q)");
+                    System.out.println("5. cube (cb)");
+                    System.out.println("6. prism (p)");
                     String option = sc.nextLine();
                     res = switch (option) {
-                        case "1", "p", "prism" -> adv.prism();
-                        case "2", "q", "quadratic" -> adv.quadratic();
-                        case "3", "rule of three", "Ro3" -> adv.Ro3();
-                        case "4", "convert", "c" -> adv.convert();
-                        default -> "Error_incorrect_input";
+                        case "1", "convert", "c" -> adv.convert();
+                        case "2", "b", "bodies" -> adv.bodies();
+                        case "3", "Ro3", "rule of three" -> adv.Ro3();
+                        case "4", "q", "quadratic" -> adv.quadratic();
+                        case "5", "cb", "cube" -> adv.cube();
+                        case "6", "p", "prism" -> adv.prism();
+                        default -> throw new RuntimeException("Unknown option: " + option);
                     };
                 }
-                case "/prism" -> res = adv.prism();
-                case "/quadratic", "/quadr" -> res = adv.quadratic();
-                case "/Ro3" -> res = adv.Ro3();
                 case "/convert", "/unit" -> res = adv.convert();
-                default -> res = "Error";
+                case "/bodies", "/body" -> res = adv.bodies();
+                case "/Ro3" -> res = adv.Ro3();
+                case "/quadratic", "/quadr" -> res = adv.quadratic();
+                case "/cube" -> res = adv.cube();
+                case "/prism" -> res = adv.prism();
+                default -> throw new RuntimeException("Unknown command: " + ex);
             }
         } else {
             Expression expression = new Expression();
             res = expression.calc(ex);
         }
-        sc.close();
         System.out.println(res);
     }
 }
 
 class Expression {
-    public String calc(String ex) {
-        double result = eval(ex);
-        return ex + " = " + result;
-    }
-
     private static double eval(String str) {
         return new Object() {
             int pos = -1, ch;
@@ -66,14 +66,14 @@ class Expression {
             double parse() {
                 nextChar();
                 double x = parseExpression();
-                if (pos < str.length()) throw new RuntimeException("Unexpected: " + (char)ch);
+                if (pos < str.length()) throw new RuntimeException("Unexpected: " + (char) ch);
                 return x;
             }
 
             double parseExpression() {
                 double x = parseTerm();
-                for (;;) {
-                    if      (skip('+')) x += parseTerm(); // addition
+                for (; ; ) {
+                    if (skip('+')) x += parseTerm(); // addition
                     else if (skip('-')) x -= parseTerm(); // subtraction
                     else return x;
                 }
@@ -81,8 +81,8 @@ class Expression {
 
             double parseTerm() {
                 double x = parseFactor();
-                for (;;) {
-                    if      (skip('*')) x *= parseFactor(); // multiplication
+                for (; ; ) {
+                    if (skip('*')) x *= parseFactor(); // multiplication
                     else if (skip('/')) x /= parseFactor(); // division
                     else return x;
                 }
@@ -115,7 +115,7 @@ class Expression {
                         default -> throw new RuntimeException("Unknown function: " + func);
                     };
                 } else {
-                    throw new RuntimeException("Unexpected: " + (char)ch);
+                    throw new RuntimeException("Unexpected: " + (char) ch);
                 }
 
                 if (skip('^')) x = Math.pow(x, parseFactor()); // exponentiation
@@ -131,8 +131,12 @@ class Expression {
             int factorial = 1;
             for (int i = 1; i <= x; i++) factorial *= i;
             return factorial;
-        }
-        else throw new RuntimeException("factorial: invalid number: " + x);
+        } else throw new RuntimeException("factorial: invalid number: " + x);
+    }
+
+    public String calc(String ex) {
+        double result = eval(ex);
+        return ex + " = " + result;
     }
 }
 
@@ -145,9 +149,17 @@ class Adv {
         double b = sc.nextDouble();
         System.out.print("side c: ");
         double c = sc.nextDouble();
-        sc.close();
         double volume = a * b * c;
         double surface = 2 * (a * b + b * c + a * c);
+        return ("volume: " + volume + "\nsurface: " + surface);
+    }
+
+    public String cube() {
+        Scanner sc = new Scanner(System.in);
+        System.out.print("side a: ");
+        double a = sc.nextDouble();
+        double volume = Math.pow(a, 3);
+        double surface = 6 * Math.pow(a, 2);
         return ("volume: " + volume + "\nsurface: " + surface);
     }
 
@@ -159,7 +171,6 @@ class Adv {
         double b = sc.nextDouble();
         System.out.print("c: ");
         double c = sc.nextDouble();
-        sc.close();
         double D = b * b - (4 * a * c);
         if (D < 0) return "no root";
         else if (D == 0) {
@@ -183,7 +194,6 @@ class Adv {
         double c = sc.nextDouble();
         System.out.println("normal or inverse proportionality? (n/i)");
         char umernost = sc.next().charAt(0);
-        sc.close();
         if (umernost == 'n') {
             double x = (b * c) / a;
             return ("x = " + x + " (normal proportionality)");
@@ -646,6 +656,19 @@ class Adv {
             default -> {
                 return "Err_incorrect_input";
             }
+        }
+    }
+
+    public String bodies() {
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Body type: (prism cube)");
+        String functionName = sc.next();  // Replace with the name of the function you want to execute
+        try {
+            Class<?> clazz = Adv.class;  // Replace with the class name where your functions are defined
+            Method method = clazz.getDeclaredMethod(functionName);
+            return (String) method.invoke(clazz.getDeclaredConstructor().newInstance());
+        } catch (Exception e) {
+            return String.valueOf(e);
         }
     }
 }
