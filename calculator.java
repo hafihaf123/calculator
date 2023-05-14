@@ -1,68 +1,38 @@
-package com.calculator;
+import java.util.ArrayDeque;
+import java.util.Scanner;
 
-import java.util.*;
-
- // Compiler version JDK 11.0.2
+// Compiler version JDK 11.0.2
 
  class calc 
  {
-   public static void main(String args[])
+   public static void main(String[] args)
    { 
        Scanner sc = new Scanner(System.in);
        System.out.print("Enter an expression: ");
        String ex = sc.nextLine();
-       String res = "";
+       String res;
        if (ex.toCharArray()[0] == '/') {
          //System.out.println("work in progress");
          Adv adv = new Adv();
-         switch (ex) {
-           case "/":
-             System.out.println("options:");
-             System.out.println("1. prism (p)");
-             System.out.println("2. quadratic function (q)");
-             System.out.println("3. trojclenka - rule of three (3)");
-             String option = sc.nextLine();
-             
-             switch (option) {
-               case "1":
-               case "p":
-               case "prism":
-                 res = adv.prism();
-                 break;
-               
-               case "2":
-               case "q":
-               case "quadratic":
-                 res = adv.quadratic();
-                 break;
-               
-               case "3":
-               case "trojclenka":
-               case "Ro3":
-                 res = adv.trojclenka();
-                 break;
-               default:
-                 res = "Error_incorrect_input";
-             }
-             break;
-           
-           case "/prism":
-             res = adv.prism();
-             break;
-           
-           case "/quadratic":
-           case "/quadr":
-             res = adv.quadratic();
-             break;
-           
-           case "/trojclenka":
-           case "/Ro3":
-             res = adv.trojclenka();
-             break;
-           
-           default:
-             res = "Error";
-         }
+           switch (ex) {
+               case "/" -> {
+                   System.out.println("options:");
+                   System.out.println("1. prism (p)");
+                   System.out.println("2. quadratic function (q)");
+                   System.out.println("3. trojclenka - rule of three (3)");
+                   String option = sc.nextLine();
+                   res = switch (option) {
+                       case "1", "p", "prism" -> adv.prism();
+                       case "2", "q", "quadratic" -> adv.quadratic();
+                       case "3", "trojclenka", "Ro3" -> adv.trojclenka();
+                       default -> "Error_incorrect_input";
+                   };
+               }
+               case "/prism" -> res = adv.prism();
+               case "/quadratic", "/quadr" -> res = adv.quadratic();
+               case "/trojclenka", "/Ro3" -> res = adv.trojclenka();
+               default -> res = "Error";
+           }
        }
        else {
          Expression expression = new Expression();
@@ -109,28 +79,30 @@ import java.util.*;
         if ((op1 == '*' || op1 == '/') && (op2 == '+' || op2 == '-')) {
             return true;
         }
-        if ((op1 == '^') && (op2 == '*' || op2 == '/' || op2 == '+' || op2 == '-')) {
-            return true;
-        }
-        return false;
+        return (op1 == '^') && (op2 == '*' || op2 == '/' || op2 == '+' || op2 == '-');
     }
     
     private static double applyOp(double num1, double num2, char op) {
         switch (op) {
-            case '+':
+            case '+' -> {
                 return num1 + num2;
-            case '-':
+            }
+            case '-' -> {
                 return num1 - num2;
-            case '*':
+            }
+            case '*' -> {
                 return num1 * num2;
-            case '/':
+            }
+            case '/' -> {
                 if (num2 == 0) {
                     System.out.println("Cannot divide by zero.");
                     System.exit(1);
                 }
                 return num1 / num2;
-            case '^':
+            }
+            case '^' -> {
                 return Math.pow(num1, num2);
+            }
         }
         return 0;
     }
@@ -206,84 +178,64 @@ import java.util.*;
        String type = sc.nextLine();
        double x; String unit; String to;
        switch (type) {
-         
+
          case "acc":
            System.out.println("unit: (m/s^2 ft/s^2 g cm/s^2)");
            unit = sc.nextLine();
-           
-           switch (unit) {
-             case "m/s^2":
-               System.out.println("convert to: (ft/s^2 g cm/s^2)");
-               to = sc.nextLine();
-               switch (to) {
-                 case "ft/s^2":
-                   x = a / 0.3048;
-                   break;
-                 case "g":
-                   x = a / 9.8066;
-                   break;
-                 case "cm/s^2":
-                   x = a / 0.01;
-                   break;
-                 default: return "Err_incorrect_input";
-               }
-               break;
-             
-             case "ft/s^2":
-               System.out.println("convert to: (m/s^2 g cm/s^2)");
-               to = sc.nextLine();
-               switch (to) {
-                 case "m/s^2":
-                   x = a / 3.2808;
-                   break;
-                 case "g":
-                   x = a / 32.174;
-                   break;
-                 case "cm/s^2":
-                   x = a / 0.0328;
-                   break;
-                 default: return "Err_incorrect_input";
-               }
-               break;
-            
-            case "g":
-               System.out.println("convert to: (m/s^2 ft/s^2 cm/s^2)");
-               to = sc.nextLine();
-               switch (to) {
-                 case "m/s^2":
-                   x = a * 9.0866;
-                   break;
-                 case "ft/s^2":
-                   x = a * 32.174;
-                   break;
-                 case "cm/s^2":
-                   x = a * 980.665;
-                   break;
-                 default: return "Err_incorrect_input";
-               }
-               break;
-             
-             case "cm/s^2":
-               System.out.println("convert to: (m/s^2 ft/s^2 g)");
-               to = sc.nextLine();
-               switch (to) {
-                 case "m/s^2":
-                   x = a / 100;
-                   break;
-                 case "ft/s^2":
-                   x = a / 30.48;
-                   break;
-                 case "g":
-                   x = a / 980.665;
-                   break;
-                 default: return "Err_incorrect_input";
-               }
-               break;
-             
-           }
-         
-         
-         
+
+             switch (unit) {
+                 case "m/s^2" -> {
+                     System.out.println("convert to: (ft/s^2 g cm/s^2)");
+                     to = sc.nextLine();
+                     switch (to) {
+                         case "ft/s^2" -> x = a / 0.3048;
+                         case "g" -> x = a / 9.8066;
+                         case "cm/s^2" -> x = a / 0.01;
+                         default -> {
+                             return "Err_incorrect_input";
+                         }
+                     }
+                 }
+                 case "ft/s^2" -> {
+                     System.out.println("convert to: (m/s^2 g cm/s^2)");
+                     to = sc.nextLine();
+                     switch (to) {
+                         case "m/s^2" -> x = a / 3.2808;
+                         case "g" -> x = a / 32.174;
+                         case "cm/s^2" -> x = a / 0.0328;
+                         default -> {
+                             return "Err_incorrect_input";
+                         }
+                     }
+                 }
+                 case "g" -> {
+                     System.out.println("convert to: (m/s^2 ft/s^2 cm/s^2)");
+                     to = sc.nextLine();
+                     switch (to) {
+                         case "m/s^2" -> x = a * 9.0866;
+                         case "ft/s^2" -> x = a * 32.174;
+                         case "cm/s^2" -> x = a * 980.665;
+                         default -> {
+                             return "Err_incorrect_input";
+                         }
+                     }
+                 }
+                 case "cm/s^2" -> {
+                     System.out.println("convert to: (m/s^2 ft/s^2 g)");
+                     to = sc.nextLine();
+                     switch (to) {
+                         case "m/s^2" -> x = a / 100;
+                         case "ft/s^2" -> x = a / 30.48;
+                         case "g" -> x = a / 980.665;
+                         default -> {
+                             return "Err_incorrect_input";
+                         }
+                     }
+                 }
+             }
+
+
+
          default: return "Err_incorrect_input";
        }
      }
