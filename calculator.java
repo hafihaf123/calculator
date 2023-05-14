@@ -1,7 +1,4 @@
-import java.util.ArrayDeque;
 import java.util.Scanner;
-
-// Compiler version JDK 11.0.2
 
 class calc {
     public static void main(String[] args) {
@@ -44,64 +41,98 @@ class calc {
 }
 
 class Expression {
-    private static boolean hasPrecedence(char op1, char op2) {
-        if ((op1 == '*' || op1 == '/') && (op2 == '+' || op2 == '-')) {
-            return true;
-        }
-        return (op1 == '^') && (op2 == '*' || op2 == '/' || op2 == '+' || op2 == '-');
-    }
-
-    private static double applyOp(double num1, double num2, char op) {
-        switch (op) {
-            case '+' -> {
-                return num1 + num2;
-            }
-            case '-' -> {
-                return num1 - num2;
-            }
-            case '*' -> {
-                return num1 * num2;
-            }
-            case '/' -> {
-                if (num2 == 0) {
-                    System.out.println("Cannot divide by zero.");
-                    System.exit(1);
-                }
-                return num1 / num2;
-            }
-            case '^' -> {
-                return Math.pow(num1, num2);
-            }
-        }
-        return 0;
-    }
-
     public String calc(String ex) {
-        String[] tokens = ex.split("(?<=[\\d.])(?=[^\\d.()])|(?<=[^\\d.()])(?=[\\d.()])");
-        ArrayDeque<Double> nums = new ArrayDeque<>();
-        ArrayDeque<Character> ops = new ArrayDeque<>();
+        double result = eval(ex);
+        return ex + " = " + result;
+    }
 
-        for (String token : tokens) {
-            if (token.matches("\\d+(\\.\\d+)?")) {
-                nums.push(Double.parseDouble(token));
-            } else if (token.matches("[+\\-*/^]")) {
-                char op = token.charAt(0);
-                while (!ops.isEmpty() && hasPrecedence(ops.peek(), op)) {
-                    double num2 = nums.pop();
-                    double num1 = nums.pop();
-                    nums.push(applyOp(num1, num2, ops.pop()));
-                }
-                ops.push(op);
-            } else {
-                return ("Invalid token: " + token);
+    private static double eval(String str) {
+        return new Object() {
+            int pos = -1, ch;
+
+            void nextChar() {
+                ch = (++pos < str.length()) ? str.charAt(pos) : -1;
             }
+
+            boolean skip(char charToSkip) {
+                while (ch == ' ') nextChar();
+                if (ch == charToSkip) {
+                    nextChar();
+                    return true;
+                }
+                return false;
+            }
+
+            double parse() {
+                nextChar();
+                double x = parseExpression();
+                if (pos < str.length()) throw new RuntimeException("Unexpected: " + (char)ch);
+                return x;
+            }
+
+            double parseExpression() {
+                double x = parseTerm();
+                for (;;) {
+                    if      (skip('+')) x += parseTerm(); // addition
+                    else if (skip('-')) x -= parseTerm(); // subtraction
+                    else return x;
+                }
+            }
+
+            double parseTerm() {
+                double x = parseFactor();
+                for (;;) {
+                    if      (skip('*')) x *= parseFactor(); // multiplication
+                    else if (skip('/')) x /= parseFactor(); // division
+                    else return x;
+                }
+            }
+
+            double parseFactor() {
+                if (skip('+')) return parseFactor(); // unary plus
+                if (skip('-')) return -parseFactor(); // unary minus
+
+                double x;
+                int startPos = this.pos;
+                if (skip('(')) { // parentheses
+                    x = parseExpression();
+                    skip(')');
+                } else if ((ch >= '0' && ch <= '9') || ch == '.') { // numbers
+                    while ((ch >= '0' && ch <= '9') || ch == '.') nextChar();
+                    x = Double.parseDouble(str.substring(startPos, this.pos));
+                } else if (ch >= 'a' && ch <= 'z') { // functions
+                    while (ch >= 'a' && ch <= 'z') nextChar();
+                    String func = str.substring(startPos, this.pos);
+                    x = parseFactor();
+                    x = switch (func) {
+                        case "sqrt" -> Math.sqrt(x);
+                        case "sin" -> Math.sin(Math.toRadians(x));
+                        case "cos" -> Math.cos(Math.toRadians(x));
+                        case "tan" -> Math.tan(Math.toRadians(x));
+                        case "ln" -> Math.log(x);
+                        case "log" -> Math.log10(x);
+                        case "fact" -> factorial(x);
+                        default -> throw new RuntimeException("Unknown function: " + func);
+                    };
+                } else {
+                    throw new RuntimeException("Unexpected: " + (char)ch);
+                }
+
+                if (skip('^')) x = Math.pow(x, parseFactor()); // exponentiation
+
+                return x;
+            }
+        }.parse();
+    }
+
+    private static double factorial(double x) {
+        if (x < 0) throw new RuntimeException("factorial: invalid number: " + x);
+        else if (x == Math.floor(x)) {
+            int factorial = 1;
+            for (int i = 1; i <= x; i++) factorial *= i;
+            return factorial;
         }
-        while (!ops.isEmpty()) {
-            double num2 = nums.pop();
-            double num1 = nums.pop();
-            nums.push(applyOp(num1, num2, ops.pop()));
-        }
-        return (ex + " = " + nums.pop());
+        else throw new RuntimeException("factorial: invalid number: " + x);
     }
 }
 
@@ -130,15 +161,15 @@ class Adv {
         double c = sc.nextDouble();
         sc.close();
         double D = b * b - (4 * a * c);
-        if (D < 0) return "no real solution";
+        if (D < 0) return "no root";
         else if (D == 0) {
             double x = (-b) / (2 * a);
-            return ("one real solution: x = " + x);
+            return ("one root: x = " + x);
         } else {
             double D_sqrt = Math.sqrt(D);
             double x1 = (-b + D_sqrt) / (2 * a);
             double x2 = (-b - D_sqrt) / (2 * a);
-            return ("two real solutions: x1 = " + x1 + " ; x2 = " + x2);
+            return ("two roots: x1 = " + x1 + " ; x2 = " + x2);
         }
     }
 
