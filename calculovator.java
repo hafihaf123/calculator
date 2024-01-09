@@ -1,11 +1,6 @@
-//package com.calculovator;
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class calculovator {
 
@@ -13,19 +8,19 @@ public class calculovator {
   {
      Scanner sc = new Scanner(System.in);
      String input;
-     
+
      while (true) {
-     input = sc.nextLine();
-     
-     if(input.equals("exit")) break;
-     
-     String result = Expression1.parse(input);
-     
-     System.out.println(result);
+       input = sc.nextLine();
+       if(Objects.equals(input, "exit")) break;
+       try {
+         String result = Expression1.parse(input);
+         System.out.println(result);
+       } catch (Exception e) {
+         System.out.println("Error: " + e.getMessage());
+       }
      }
-     
-     System.out.println("bye");
-     
+
+    System.out.println("bye");
      sc.close();
   }
 }
@@ -85,22 +80,22 @@ class Expression1 {
     }
     
     if (!isFirstNumber) {
-      String firstCh = characters.get(0);
+      String firstCh = characters.getFirst();
       
       if (firstCh.contains("+")) {
         firstCh = firstCh.replaceAll("\\+", "");
         characters.set(0, firstCh);
-        System.out.println(characters.get(0));
+        System.out.println(characters.getFirst());
       }
       if (firstCh.contains("-")) {
-        numbers.add(0,"0");
+        numbers.addFirst("0");
       }
       else if (firstCh.equals("(")) {
-        numbers.add(0, "0");
+        numbers.addFirst("0");
         characters.set(0, "+(");
       }
       else if (firstCh.contains("(")){
-        numbers.add(0, "0");
+        numbers.addFirst("0");
         characters.set(0, "+" + firstCh);
       }
     }
@@ -137,13 +132,13 @@ class Expression1 {
         String braceEndCh = characters.get(end);
         braceEndCh = braceEndCh.replaceFirst("\\)", "");
         
-        if (braceStartCh.equals("")) {
+        if (braceStartCh.isEmpty()) {
           characters.remove(start-1);
         }
         else {
           characters.set(start-1, braceStartCh);
         }
-        if (braceEndCh.equals("")) {
+        if (braceEndCh.isEmpty()) {
           characters.remove(end);
         }
         else {
@@ -176,12 +171,13 @@ class Expression1 {
           case "/", "÷" -> Utility.priorityOperation(numbers, characters, i, priorityOperations.DIVIDE);
           case "^", "**", "pow" -> Utility.priorityOperation(numbers, characters, i, priorityOperations.POWER);
         }
+        lenC = characters.size();
       }
     }
     
     lenC = characters.size();
     
-    BigDecimal result = new BigDecimal(numbers.get(0));
+    BigDecimal result = new BigDecimal(numbers.getFirst());
     
     for (int i = 0 ; i < lenC ; i++) {
       switch (characters.get(i)) {
