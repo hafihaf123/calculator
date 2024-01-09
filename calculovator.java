@@ -40,12 +40,11 @@ class Expression {
     List<String> characters = new ArrayList<>();
     
     char[] arr = expression.toCharArray();
-    int len = arr.length;
     boolean isFirstNumber = true;
     
     int i, numi = 0, chari = 0;
     
-    for(i = 0 ; i < len ; i++) {
+    for(i = 0 ; i < arr.length ; i++) {
       if (Utility.isDigit(arr[i])) {
         if (i == 0) {
           isFirstNumber = true;
@@ -102,7 +101,7 @@ class Expression {
       }
       else if (firstCh.contains("(")){
         numbers.add(0, "0");
-        //characters.set(0, "+" + firstCh);
+        characters.set(0, "+" + firstCh);
       }
     }
     
@@ -170,37 +169,26 @@ class Expression {
     System.out.println(characters);
     System.out.println(numbers);
     
-    while (Utility. listContains(characters, "*x/÷^")) {
+    while (Utility.listContains(characters, "*/÷^abcdefghijklmnopqrstuvwxyz")) {
       for (int i = 0 ; i < lenC ; i++) {
         switch(characters.get(i)) {
           case "*":
           case "x":
-            BigDecimal m1 = new BigDecimal(numbers.get(i));
-            BigDecimal m2 = new BigDecimal(numbers.get(i+1));
-            BigDecimal multipRes = m1.multiply(m2);
-            Utility.replaceRange(numbers, i, i+1, multipRes + "");
-            characters.remove(i);
-            lenC = characters.size();
+			Utility.priorityOperation(numbers, characters, i, priorityOperations.MULTIPLY);
             break;
           case "/":
           case "÷":
-            /*BigDecimal d1 = new BigDecimal(numbers.get(i));
-            BigDecimal d2 = new BigDecimal(numbers.get(i+1));
-            int scale = 10;
-            BigDecimal divRes = d1.divide(d2, scale, RoundingMode.HALF_UP);
-            Utility.replaceRange(numbers, i, i+1, divRes + "");
-            characters.remove(i);*/
-            Utility.priorityOperation(numbers, characters, i, Operations.DIVIDE);
-            lenC = characters.size();
+            Utility.priorityOperation(numbers, characters, i, priorityOperations.DIVIDE);
             break;
           case "^":
           case "**":
-            Utility.priorityOperation(numbers, characters, i, Operations.POWER);
-            lenC = characters.size();
-            
+          case "pow":
+            Utility.priorityOperation(numbers, characters, i, priorityOperations.POWER);
         } 
       }
     }
+    
+    lenC = characters.size();
     
     BigDecimal result = new BigDecimal(numbers.get(0));
     
@@ -261,21 +249,31 @@ class Utility {
     return false;
   }
 
-  public static void priorityOperation(List<String> numbers, List<String> characters, int i, Operations op) {
-    BigDecimal e1 = new BigDecimal(numbers.get(i));
-    BigDecimal e2 = new BigDecimal(numbers.get(i+1));
-    switch //TODO
-    BigDecimal expRes = e1.pow(e2.intValue());
-    Utility.replaceRange(numbers, i, i+1, expRes + "");
+  public static void priorityOperation(List<String> numbers, List<String> characters, int i, priorityOperations op) {
+    BigDecimal first = new BigDecimal(numbers.get(i));
+    BigDecimal second = new BigDecimal(numbers.get(i+1));
+    BigDecimal res = new BigDecimal(0);
+    switch (op) {
+    	case DIVIDE:
+    		int scale = 10;
+    		res = first.divide(second, scale, RoundingMode.HALF_UP);
+    		break;
+    	case MULTIPLY:
+    		res = first.multiply(second);
+    		break;
+    	case POWER:
+    		res = first.pow(second.intValue());
+    		break;
+    	default:
+    		System.out.println("Error, priority operation not expected");
+    }
+    Utility.replaceRange(numbers, i, i+1, res + "");
     characters.remove(i);
-    //lenC = characters.size();
   }
   
 }
 
-enum Operations {
-  ADD,
-  SUBTRACT,
+enum priorityOperations {
   MULTIPLY,
   DIVIDE,
   POWER;
