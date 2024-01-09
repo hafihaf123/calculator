@@ -1,4 +1,4 @@
-package com.calculovator;
+//package com.calculovator;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -7,7 +7,7 @@ import java.util.Scanner;
 import java.util.function.UnaryOperator;
 import java.math.RoundingMode;
 
-public class Main {
+public class calculovator {
 
   public static void main(String[] args)
   {
@@ -184,21 +184,18 @@ class Expression {
             break;
           case "/":
           case "÷":
-            BigDecimal d1 = new BigDecimal(numbers.get(i));
+            /*BigDecimal d1 = new BigDecimal(numbers.get(i));
             BigDecimal d2 = new BigDecimal(numbers.get(i+1));
             int scale = 10;
             BigDecimal divRes = d1.divide(d2, scale, RoundingMode.HALF_UP);
             Utility.replaceRange(numbers, i, i+1, divRes + "");
-            characters.remove(i);
+            characters.remove(i);*/
+            Utility.priorityOperation(numbers, characters, i, Operations.DIVIDE);
             lenC = characters.size();
             break;
           case "^":
           case "**":
-            BigDecimal e1 = new BigDecimal(numbers.get(i));
-            BigDecimal e2 = new BigDecimal(numbers.get(i+1));
-            BigDecimal expRes = e1.pow(e2.intValue());
-            Utility.replaceRange(numbers, i, i+1, expRes + "");
-            characters.remove(i);
+            Utility.priorityOperation(numbers, characters, i, Operations.POWER);
             lenC = characters.size();
             
         } 
@@ -263,5 +260,23 @@ class Utility {
     if (c == '.' || c == ',') return true;
     return false;
   }
+
+  public static void priorityOperation(List<String> numbers, List<String> characters, int i, Operations op) {
+    BigDecimal e1 = new BigDecimal(numbers.get(i));
+    BigDecimal e2 = new BigDecimal(numbers.get(i+1));
+    switch //TODO
+    BigDecimal expRes = e1.pow(e2.intValue());
+    Utility.replaceRange(numbers, i, i+1, expRes + "");
+    characters.remove(i);
+    //lenC = characters.size();
+  }
   
+}
+
+enum Operations {
+  ADD,
+  SUBTRACT,
+  MULTIPLY,
+  DIVIDE,
+  POWER;
 }
