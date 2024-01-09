@@ -1,25 +1,25 @@
 //package com.calculovator;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
-import java.util.function.UnaryOperator;
-import java.math.RoundingMode;
 
 public class calculovator {
 
   public static void main(String[] args)
   {
      Scanner sc = new Scanner(System.in);
-     String input = "";
+     String input;
      
      while (true) {
      input = sc.nextLine();
      
      if(input.equals("exit")) break;
      
-     String result = Expression.parse(input);
+     String result = Expression1.parse(input);
      
      System.out.println(result);
      }
@@ -30,11 +30,11 @@ public class calculovator {
   }
 }
 
-class Expression {
+class Expression1 {
   
   public static String parse(String expression) {
     
-    String result = "error";
+    String result;
     
     List<String> numbers = new ArrayList<>();
     List<String> characters = new ArrayList<>();
@@ -48,7 +48,7 @@ class Expression {
       if (Utility.isDigit(arr[i])) {
         if (i == 0) {
           isFirstNumber = true;
-          numbers.add(arr[i] + "");
+          numbers.add(String.valueOf(arr[i]));
         }
         else {
           if (Utility.isDigit(arr[i-1])){
@@ -57,7 +57,7 @@ class Expression {
             numbers.set(numi, numberInList);
           }
           else {
-            numbers.add(arr[i] + "");
+            numbers.add(String.valueOf(arr[i]));
             numi++;
           } 
         }
@@ -66,13 +66,13 @@ class Expression {
       else {
         if (i == 0) {
           isFirstNumber = false;
-          characters.add(arr[i] + "");
+          characters.add(String.valueOf(arr[i]));
         }
         else {
           if (Utility.isDigit(arr[i-1])){
             if (!characters.isEmpty()) 
               chari++;
-            characters.add(arr[i] + ""); 
+            characters.add(String.valueOf(arr[i]));
           }
           else {
             String characterInList = characters.get(chari);
@@ -88,7 +88,7 @@ class Expression {
       String firstCh = characters.get(0);
       
       if (firstCh.contains("+")) {
-        firstCh.replaceAll("\\+", "");
+        firstCh = firstCh.replaceAll("\\+", "");
         characters.set(0, firstCh);
         System.out.println(characters.get(0));
       }
@@ -149,9 +149,9 @@ class Expression {
         else {
           characters.set(end, braceEndCh);
         }
-        
-        for (int ii=start;ii<end;ii++){
-          characters.remove(start);
+
+        if (end > start) {
+          characters.subList(start, end).clear();
         }
         
         braceIndex++;
@@ -171,20 +171,11 @@ class Expression {
     
     while (Utility.listContains(characters, "*/÷^abcdefghijklmnopqrstuvwxyz")) {
       for (int i = 0 ; i < lenC ; i++) {
-        switch(characters.get(i)) {
-          case "*":
-          case "x":
-			Utility.priorityOperation(numbers, characters, i, priorityOperations.MULTIPLY);
-            break;
-          case "/":
-          case "÷":
-            Utility.priorityOperation(numbers, characters, i, priorityOperations.DIVIDE);
-            break;
-          case "^":
-          case "**":
-          case "pow":
-            Utility.priorityOperation(numbers, characters, i, priorityOperations.POWER);
-        } 
+        switch (characters.get(i)) {
+          case "*", "x" -> Utility.priorityOperation(numbers, characters, i, priorityOperations.MULTIPLY);
+          case "/", "÷" -> Utility.priorityOperation(numbers, characters, i, priorityOperations.DIVIDE);
+          case "^", "**", "pow" -> Utility.priorityOperation(numbers, characters, i, priorityOperations.POWER);
+        }
       }
     }
     
@@ -193,17 +184,13 @@ class Expression {
     BigDecimal result = new BigDecimal(numbers.get(0));
     
     for (int i = 0 ; i < lenC ; i++) {
-      switch(characters.get(i)) {
-        case "+":
-          result = result.add(new BigDecimal(numbers.get(i+1))) ;
-          break;
-        case "-":
-          result = result.subtract(new BigDecimal(numbers.get(i+1))) ;
-          break;
+      switch (characters.get(i)) {
+        case "+" -> result = result.add(new BigDecimal(numbers.get(i + 1)));
+        case "-" -> result = result.subtract(new BigDecimal(numbers.get(i + 1)));
       }
     }
     
-    return result + "";
+    return String.valueOf(result);
   }
   
 }
@@ -211,42 +198,29 @@ class Expression {
 class Utility {
   
   public static void replaceRange(List<String> list, int from, int to, final String toReplace) {
-    list.subList(from, to+1).replaceAll(new UnaryOperator<String>() {
-        @Override
-        public String apply(String e) {
-            return toReplace;
-        }
-    });
-    for (int i = to ; i > from ; i--){
-      list.remove(i);
+    Collections.fill(list.subList(from, to + 1), toReplace);
+    if (to >= from + 1) {
+      list.subList(from + 1, to + 1).clear();
     }
   }
   
   public static boolean listContains(List<String> list, String x)
   {
-    int len = list.size();
     String listI;
     char[] arr = x.toCharArray();
-    
-    for(int i = 0 ; i < len ; i++) {
-      listI = list. get(i);
-      for(int ii=0;ii<arr.length;ii++) {
-        if (listI.contains(arr[ii]+"")) return true; 
+
+    for (String s : list) {
+      listI = s;
+      for (char c : arr) {
+        if (listI.contains(String.valueOf(c))) return true;
       }
     }
     return false;
   }
   
-  public static void addToStartAtI(List<String> list, int index, String toAdd) {
-    String original = list.get(index);
-    String newS = toAdd + original;
-    list.set(index, newS);
-  }
-  
   public static boolean isDigit(char c) {
     if (Character.isDigit(c)) return true;
-    if (c == '.' || c == ',') return true;
-    return false;
+    return c == '.' || c == ',';
   }
 
   public static void priorityOperation(List<String> numbers, List<String> characters, int i, priorityOperations op) {
@@ -254,20 +228,15 @@ class Utility {
     BigDecimal second = new BigDecimal(numbers.get(i+1));
     BigDecimal res = new BigDecimal(0);
     switch (op) {
-    	case DIVIDE:
-    		int scale = 10;
-    		res = first.divide(second, scale, RoundingMode.HALF_UP);
-    		break;
-    	case MULTIPLY:
-    		res = first.multiply(second);
-    		break;
-    	case POWER:
-    		res = first.pow(second.intValue());
-    		break;
-    	default:
-    		System.out.println("Error, priority operation not expected");
+      case DIVIDE -> {
+        int scale = 10;
+        res = first.divide(second, scale, RoundingMode.HALF_UP);
+      }
+      case MULTIPLY -> res = first.multiply(second);
+      case POWER -> res = first.pow(second.intValue());
+      default -> System.out.println("Error, priority operation not expected");
     }
-    Utility.replaceRange(numbers, i, i+1, res + "");
+    Utility.replaceRange(numbers, i, i+1, String.valueOf(res));
     characters.remove(i);
   }
   
@@ -276,5 +245,5 @@ class Utility {
 enum priorityOperations {
   MULTIPLY,
   DIVIDE,
-  POWER;
+  POWER
 }
